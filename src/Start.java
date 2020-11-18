@@ -12,33 +12,42 @@ class Start {
         String usrVar = usrInput.nextLine();
 
         Calc calc = new Calc();
-        String[] arg = calc.getArg(usrVar);
-        int result = calc.calc(arg[3],
-                Integer.parseInt(arg[1]),
-                Integer.parseInt(arg[2]));
 
-        if (arg[0].equals("rome")){
-            System.out.println(RomanArabicConverter.arabicToRoman(result));
-        }else{
-            System.out.println(result);
+        try{
+            String[] arg = calc.getArg(usrVar);
+            int result = calc.calc(arg[3],
+                    Integer.parseInt(arg[1]),
+                    Integer.parseInt(arg[2]));
+
+            if (arg[0].equals("rome")){
+                System.out.println(RomanArabicConverter.arabicToRoman(result));
+            }else{
+                System.out.println(result);
+            }
+        }
+        catch(Exception ex) {
+            System.out.println(ex.getMessage());
         }
     }
-
 }
 
 class Calc {
 
-    public String[] getArg(String usrVar){
+    public String[] getArg(String usrVar) throws Exception {
         String[] result = validat(usrVar);
-        if (result[0].equals("rome")){
+        if (result[0].equals("rome")) {
             result[1] = String.valueOf(RomanArabicConverter.romanToArabic(result[1]));
             result[2] = String.valueOf(RomanArabicConverter.romanToArabic(result[2]));
+        }
+        if ((Integer.parseInt(result[1]) > 10 || Integer.parseInt(result[1]) < 1) ||
+                (Integer.parseInt(result[2]) > 10 || Integer.parseInt(result[2]) < 1)) {
+            throw new Exception("Калькулятор работает только с числами от 1 до 10 включительно.");
         }
         return result;
     }
 
     //  обработка входящей строки - получение аргументов и типа действия
-    public String[] validat(String usrVar) {
+    public String[] validat(String usrVar) throws Exception {
       usrVar = usrVar.replaceAll("\\s+", "");
         char[] act = new char[]{'+', '-', '*', '/'};
         int indexM = -1;
@@ -47,11 +56,13 @@ class Calc {
                 indexM = usrVar.indexOf(c);
             }
         }
-        if (indexM == -1) {return new String[] {"Err01"};}
+        if (indexM == -1) {throw new Exception("Не указанно арифмитическое действие");}
 
         String[] argument = usrVar.split(Pattern.quote(String.valueOf(usrVar.charAt(indexM))));    // Pattern.quote регулярка для (*,+,/)
 
-        if (argument.length!=2) {return new String[] {"Err01"};}
+        if (argument.length!=2) {throw new Exception("Не правильный ввод - Введите два висла.");}
+
+        //Определение типа чисел (арабские или римские)
         if ((argument[0].matches("\\d+"))
                 && (argument[1].matches("\\d+"))) {
             return new String[] {"arabian", argument[0], argument[1], String.valueOf(usrVar.charAt(indexM))};
@@ -59,11 +70,11 @@ class Calc {
                 && (argument[1].matches("^[IVX]+"))) {
             return new String[] {"rome", argument[0], argument[1], String.valueOf(usrVar.charAt(indexM))};
         }else{
-            return new String[] {"Err01"};
+            throw new Exception("Введенные аргументы не являются целыми числами, либо введены числа разного вида.");
         }
     }
 
-    public int calc(String job, int arg1, int arg2){
+    public int calc(String job, int arg1, int arg2) throws Exception {
         // сделать расчет
         int result = 0;
         switch(job){
@@ -77,8 +88,10 @@ class Calc {
                 result = arg1*arg2;
                 break;
             case "/":
-                if (arg1 != 0){
+                if (arg2 != 0){
                     result = arg1/arg2;
+                }else {
+                    throw new Exception("Деление на ноль не возможно.");
                 }
                 break;
         }
@@ -127,7 +140,7 @@ class RomanArabicConverter {
         }
 
         if (romanNumeral.length() > 0) {
-            throw new IllegalArgumentException(input + " cannot be converted to a Roman Numeral");
+            throw new IllegalArgumentException(input + " не правильная запись, невозможно преобразовать");
         }
 
         return result;
@@ -135,7 +148,7 @@ class RomanArabicConverter {
 
     public static String arabicToRoman(int number) {
         if ((number <= 0) || (number > 4000)) {
-            throw new IllegalArgumentException(number + " is not in range (0,4000]");
+            throw new IllegalArgumentException(number + " использование римских чисел возможно в диапозоне (0,4000]");
         }
 
         List<RomanNumeral> romanNumerals = RomanNumeral.getReverseSortedValues();
