@@ -13,14 +13,15 @@ class Start {
 
         Calc calc = new Calc();
         String[] arg = calc.getArg(usrVar);
-        int result = calc.calc(arg[3], Integer.valueOf(arg[1]), Integer.valueOf(arg[2]));
+        int result = calc.calc(arg[3],
+                Integer.parseInt(arg[1]),
+                Integer.parseInt(arg[2]));
 
-        if (arg[0] == "rome"){
+        if (arg[0].equals("rome")){
             System.out.println(RomanArabicConverter.arabicToRoman(result));
         }else{
             System.out.println(result);
         }
-
     }
 
 }
@@ -29,7 +30,7 @@ class Calc {
 
     public String[] getArg(String usrVar){
         String[] result = validat(usrVar);
-        if (result[0]=="rome"){
+        if (result[0].equals("rome")){
             result[1] = String.valueOf(RomanArabicConverter.romanToArabic(result[1]));
             result[2] = String.valueOf(RomanArabicConverter.romanToArabic(result[2]));
         }
@@ -41,10 +42,10 @@ class Calc {
       usrVar = usrVar.replaceAll("\\s+", "");
         char[] act = new char[]{'+', '-', '*', '/'};
         int indexM = -1;
-        for (int i=0; i<act.length; i++){
-             if (usrVar.indexOf(act[i]) != -1) {
-                indexM = usrVar.indexOf(act[i]);
-           }
+        for (char c : act) {
+            if (usrVar.indexOf(c) != -1) {
+                indexM = usrVar.indexOf(c);
+            }
         }
         if (indexM == -1) {return new String[] {"Err01"};}
 
